@@ -52,7 +52,7 @@ describe QuotaTracker do
       stats[:quota_used_so_far].to_i.should > 0
       stats[:remaining_quota].to_i.should > 0
       stats[:quota_type].should == "daily"
-      puts "#{group}: #{stats[:quota_used_so_far]} used, #{stats[:remaining_quota]} remaining"
+#      puts "#{group}: #{stats[:quota_used_so_far]} used, #{stats[:remaining_quota]} remaining"
     end
   end
 end
