@@ -1,0 +1,6 @@
+pkg/*
+*.gem
+.bundle
+*~
+*swp
+.DS_Store

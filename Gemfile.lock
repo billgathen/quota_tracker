@@ -1,0 +1,38 @@
+PATH
+  remote: .
+  specs:
+    quota_tracker (0.0.1)
+      savon (>= 0.8.5)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    builder (3.0.0)
+    crack (0.1.8)
+    diff-lcs (1.1.2)
+    gyoku (0.3.1)
+      builder (>= 2.1.2)
+    httpi (0.7.9)
+      rack
+    rack (1.2.1)
+    rspec (2.5.0)
+      rspec-core (~> 2.5.0)
+      rspec-expectations (~> 2.5.0)
+      rspec-mocks (~> 2.5.0)
+    rspec-core (2.5.1)
+    rspec-expectations (2.5.0)
+      diff-lcs (~> 1.1.2)
+    rspec-mocks (2.5.0)
+    savon (0.8.5)
+      builder (>= 2.1.2)
+      crack (~> 0.1.8)
+      gyoku (>= 0.3.0)
+      httpi (>= 0.7.8)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  quota_tracker!
+  rspec
+  savon (>= 0.8.5)
