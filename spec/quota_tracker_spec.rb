@@ -2,11 +2,26 @@ require 'quota_tracker'
 
 describe QuotaTracker do
   before do
-    @qt = QuotaTracker::Client.new({ :user => ENV['YIELDMANAGER_USER'], :pass => ENV['YIELDMANAGER_PASS'], :version => ENV['YIELDMANAGER_API_VERSION']})
+    @login_args = {
+      :user => ENV['YIELDMANAGER_USER'],
+      :pass => ENV['YIELDMANAGER_PASS'],
+      :version => ENV['YIELDMANAGER_API_VERSION']
+    }
+    @qt = QuotaTracker::Client.new(@login_args.merge(:env => "test"))
   end
 
   it "complains when created without user/pass" do
     lambda{ QuotaTracker::Client.new() }.should raise_error("Please supply hash containing :user, :pass and :version")
+  end
+
+  it "defaults to production" do
+    @qt_prod = QuotaTracker::Client.new(@login_args)
+    @qt_prod.domain.should == "https://api.yieldmanager.com"
+  end
+
+  it "runs in test on request" do
+    @qt_test = QuotaTracker::Client.new(@login_args.merge(:env => "test"))
+    @qt_test.domain.should == "https://api-test.yieldmanager.com"
   end
 
   it "returns quota usage for AccountManagement command group" do

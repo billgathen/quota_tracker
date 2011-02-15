@@ -2,8 +2,9 @@ module QuotaTracker
   require 'savon'
 
   class Client
-    Domain = "https://api-test.yieldmanager.com"
-#    Domain = "https://api.yieldmanager.com"
+    attr_reader :domain
+    TestDomain = "https://api-test.yieldmanager.com"
+    ProductionDomain = "https://api.yieldmanager.com"
 
     CommandGroups = {
       "AccountManagement" => { :service => :contact, :method => :getSelf, :args => {} }, # Contact, Entity
@@ -27,6 +28,11 @@ module QuotaTracker
       @user = login_args[:user]
       @pass = login_args[:pass]
       @version = login_args[:version]
+      if login_args[:env] && login_args[:env].downcase == "test"
+        @domain = TestDomain
+      else
+        @domain = ProductionDomain
+      end
     end
 
     def command_groups
@@ -44,7 +50,8 @@ module QuotaTracker
 
     def build_client(name)
       version = @version # can't see instance variables within config block
-      Savon::Client.new { wsdl.document = "#{Domain}/api-#{version}/#{name}.php?wsdl" }
+      path = "#{@domain}/api-#{version}/#{name}.php?wsdl"
+      Savon::Client.new { wsdl.document = path }
     end
 
     def login(contact)
