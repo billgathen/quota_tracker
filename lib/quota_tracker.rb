@@ -128,5 +128,12 @@ module QuotaTracker
       end
       usage
     end
+
+    def get_methods_for_service(service_name)
+      session do |t|
+        svc = build_client(service_name)
+        svc.wsdl.soap_actions.map{|a| a.to_s }.sort
+      end
+    end
   end
 end
