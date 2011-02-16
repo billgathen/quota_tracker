@@ -121,6 +121,18 @@ module QuotaTracker
       end
     end
 
+    def get_usage_for_method(svc, mthd)
+      results = {}
+      session do |token|
+        quota_client = build_client("quota")
+        rsp = quota_client.request :getQuotaByServiceByMethod do
+          soap.body = { :token => token, "service_name" => svc, "service_method" => mthd }
+        end
+        results = rsp.to_hash[:get_quota_by_service_by_method_response][:quota][:item]
+      end
+      results
+    end
+
     def get_usage_for_all
       usage = {}
       CommandGroups.each do |group, lookup|

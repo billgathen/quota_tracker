@@ -60,6 +60,19 @@ describe QuotaTracker do
   #      puts "#{group}: #{stats[:quota_used_so_far]} used, #{stats[:remaining_quota]} remaining"
       end
     end
+
+    it "by method" do
+      usage = @qt.get_usage_for_method("EntityService","get")
+      usage.should_not be_nil
+      usage.size.should > 0
+      usage[:service].should == "EntityService"
+      usage[:method].should == "get"
+      usage[:used].to_i.should > -1 # could be zero if not used today
+#      puts "#{usage[:service]}.#{usage[:method]}: #{usage[:used]} used today"
+
+      usage = @qt.get_usage_for_method("ContactService","login")
+      usage.should be_nil # method is outside quota system, so it returns nothing
+    end
   end
 
   describe "lookup" do
