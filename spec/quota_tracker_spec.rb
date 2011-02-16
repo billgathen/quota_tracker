@@ -62,11 +62,11 @@ describe QuotaTracker do
     end
 
     it "by method" do
-      usage = @qt.get_usage_for_method("EntityService","get")
+      usage = @qt.get_usage_for_method("EntityService","getAll")
       usage.should_not be_nil
       usage.size.should > 0
       usage[:service].should == "EntityService"
-      usage[:method].should == "get"
+      usage[:method].should == "getAll"
       usage[:used].to_i.should > -1 # could be zero if not used today
 #      puts "#{usage[:service]}.#{usage[:method]}: #{usage[:used]} used today"
 
@@ -79,27 +79,37 @@ describe QuotaTracker do
     it "methods by service" do
       contact_methods = [
         "add",
-        "change_password",
+        "changePassword",
         "delete",
         "get",
-        "get_active_sessions",
-        "get_all",
-        "get_all_since",
-        "get_by_entity",
-        "get_self",
-        "list_all",
-        "list_all_deleted_since",
-        "list_all_since",
-        "list_by_entity",
+        "getActiveSessions",
+        "getAll",
+        "getAllSince",
+        "getByEntity",
+        "getSelf",
+        "listAll",
+        "listAllDeletedSince",
+        "listAllSince",
+        "listByEntity",
         "login",
         "logout",
-        "logout_all",
-        "set_password",
+        "logoutAll",
+        "setPassword",
         "update",
-        "validate_credentials"
+        "validateCredentials"
       ]
       found_methods = @qt.get_methods_for_service("contact")
       found_methods.sort.should == contact_methods
+    end
+  end
+
+  describe "converts" do
+    it "snake_case to camelCase" do
+      @qt.to_camelcase(nil).should == nil
+      @qt.to_camelcase("").should == ""
+      @qt.to_camelcase("get").should == "get"
+      @qt.to_camelcase("get_all").should == "getAll"
+      @qt.to_camelcase("list_by_entity").should == "listByEntity"
     end
   end
 end
