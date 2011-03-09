@@ -18,6 +18,16 @@ module QuotaTracker
   #    "OpportunityReports" => {} # ReportService#opportunityRequestViaXML: never used
     }
 
+    ServicesByCommandGroup = {
+      "AccountManagement" => ["contact", "entity"],
+      "Creatives" => ["creative"], # (except add, addCreatives and addSupportingFiles)
+      "CreativeUpload" => ["creative"], # (add, addCreatives and addSupportingFiles)
+      "Inventory" => ["section", "site"],
+      "NetworkManagement" => ["dictionary", "linking", "notification", "pixel", "search"],
+      "Orders" => ["campaign", "insertion_order", "line_item", "target_profile"],
+      "Reports" => ["report"] # (except opportunityRequestViaXML)
+    }
+
     LoginOptions = {
       :errors_level => 'throw_errors',
       :multiple_sessions => '1'
@@ -37,6 +47,10 @@ module QuotaTracker
 
     def command_groups
       CommandGroups.keys.sort
+    end
+
+    def services_by_command_group name
+      ServicesByCommandGroup[name]
     end
 
     def be_quiet

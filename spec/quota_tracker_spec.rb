@@ -7,7 +7,8 @@ describe QuotaTracker do
       :pass => ENV['YIELDMANAGER_PASS'],
       :version => ENV['YIELDMANAGER_API_VERSION']
     }
-    @qt = QuotaTracker::Client.new(@login_args.merge(:env => "test"))
+#    @qt = QuotaTracker::Client.new(@login_args.merge(:env => "test"))
+    @qt = QuotaTracker::Client.new(@login_args)
   end
 
   describe "setup" do
@@ -57,7 +58,7 @@ describe QuotaTracker do
         stats[:quota_used_so_far].to_i.should > 0
         stats[:remaining_quota].to_i.should > 0
         stats[:quota_type].should == "daily"
-  #      puts "#{group}: #{stats[:quota_used_so_far]} used, #{stats[:remaining_quota]} remaining"
+        puts "#{group}: #{stats[:quota_used_so_far]} used, #{stats[:remaining_quota]} remaining"
       end
     end
 
@@ -73,9 +74,24 @@ describe QuotaTracker do
       usage = @qt.get_usage_for_method("ContactService","login")
       usage.should be_nil # method is outside quota system, so it returns nothing
     end
+
+    it "by all methods for a service" do
+      svc = "campaign"
+      methods = @qt.get_methods_for_service(svc)
+      methods.each_with_index do |mthd,idx|
+        usage = @qt.get_usage_for_method(@qt.to_camelcase(svc).capitalize + "Service",mthd)
+        puts "[#{idx+1} of #{methods.size}] #{usage[:service]}.#{usage[:method]}: #{usage[:used]} used today"
+      end
+    end
   end
 
   describe "lookup" do
+    it "services by command group" do
+      services = ["dictionary", "linking", "notification", "pixel", "search"]
+      command_group = "NetworkManagement"
+      @qt.services_by_command_group(command_group).should == services
+    end
+
     it "methods by service" do
       contact_methods = [
         "add",
