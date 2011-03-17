@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'lib/quota_tracker'
+
+QuotaTracker::Client.system_check ARGV[0]

@@ -33,6 +33,26 @@ module QuotaTracker
       :multiple_sessions => '1'
     }
 
+    def self.system_check env = "prod"
+      qt = QuotaTracker::Client.new({
+        :user => ENV['YIELDMANAGER_USER'],
+        :pass => ENV['YIELDMANAGER_PASS'],
+        :version => ENV['YIELDMANAGER_API_VERSION'],
+        :env => env
+      })
+      puts
+      puts "Running against #{qt.domain}"
+      puts
+      usage = qt.get_usage_for_all
+      puts sprintf('%20s%10s%10s','Command Group','Used','Remaining')
+      puts "-" * 40
+      usage.keys.sort.each do |group|
+        stats = usage[group]
+        puts sprintf('%20s%10d%10d', group, stats[:quota_used_so_far], stats[:remaining_quota])
+      end
+      puts
+    end
+
     def initialize(login_args = {})
       fail "Please supply hash containing :user, :pass and :version" unless login_args[:user] && login_args[:pass] && login_args[:version]
       @user = login_args[:user]

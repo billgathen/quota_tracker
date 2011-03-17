@@ -76,6 +76,7 @@ describe QuotaTracker do
     end
 
     it "by all methods for a service" do
+      pending
       svc = "campaign"
       methods = @qt.get_methods_for_service(svc)
       methods.each_with_index do |mthd,idx|
