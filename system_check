@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
+$:.unshift File.dirname(__FILE__) # add local dir into load path
 
-require 'rubygems'
+require 'rubygems' unless RUBY_VERSION.start_with?('1.9')
 require 'lib/quota_tracker'
 
 QuotaTracker::Client.system_check ARGV[0]
