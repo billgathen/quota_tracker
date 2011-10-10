@@ -43,12 +43,19 @@ module QuotaTracker
       puts
       puts "Running against #{qt.domain}"
       puts
+      puts sprintf('%20s%20s','Command Group','Daily Quota')
+      puts "-" * 40
+      quotas = qt.get_quota_for_cmd_groups
+      quotas.keys.sort.each do |group|
+        puts sprintf('%20s%20d', group, quotas[group])
+      end
+      puts
       usage = qt.get_usage_for_all
       puts sprintf('%20s%10s%10s','Command Group','Used','Remaining')
       puts "-" * 40
       usage.keys.sort.each do |group|
         stats = usage[group]
-        puts sprintf('%20s%10d%10d', group, stats[:quota_used_so_far], stats[:remaining_quota])
+        puts sprintf('%20s%10d%10d %s', group, stats[:quota_used_so_far] || 0, stats[:remaining_quota] || 0, stats[:error])
       end
       puts
     end
@@ -130,28 +137,37 @@ module QuotaTracker
       end
     end
 
-    def get_quota_by_cmd_group
+    def get_quota_for_cmd_groups
       quotas = {}
       session do |token|
-        quota = build_client("quota")
-        CommandGroups.each do |group|
-          rsp = quota.request :getQuotaByCmdGroup do
-            soap.body = { :token => token, "cmdgroup_name" => group }
-          end
-          quota_hash = rsp.to_hash[:get_quota_by_cmd_group_response][:quota]
-          quotas[quota_hash[:item][:cmdgroup_name]] = quota_hash[:item][:limit]
+        client = build_client("quota")
+        command_groups.each do |group|
+          quotas[group] = get_quota_for_cmd_group client, token, group
         end
       end
       quotas
     end
 
+    def get_quota_for_cmd_group client, token, group
+      rsp = client.request :getQuotaByCmdGroup do
+        soap.body = { :token => token, "cmdgroup_name" => group }
+      end
+      rsp_hash = rsp.to_hash[:get_quota_by_cmd_group_response][:quota]
+      rsp_hash[:item][:limit]
+    end
+
     def get_usage_for_service svc, mthd, args = {}
       session do |t|
-        svc_client = build_client(svc)
-        rsp = svc_client.request mthd do
-          soap.body = { :token => t }.merge(args)
+        begin
+          svc_client = build_client(svc)
+          rsp = svc_client.request mthd do
+            soap.body = { :token => t }.merge(args)
+          end
+          rsp.header
+        rescue => e
+          #puts "#{svc}.#{mthd} #{e.message}"
+          {:error => e.message}
         end
-        rsp.header
       end
     end
 
